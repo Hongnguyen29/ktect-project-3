@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Title</title>
+  </head>
+  <body>
+    <h1>My Profile</h1>
+    <form action="/users/logout" method="post">
+      <input type="submit" value="로그아웃" />
+
+      <form action="/users/profile" method="post">
+        <div>
+          <label for="nickname-input">Nickname : </label>
+          <input type="text" name="nickname" id="nickname-input" />
+        </div>
+        <div>
+          <label for="name-input">Name : </label>
+          <input type="text" name="name" id="name-input" />
+        </div>
+        <div>
+          <label for="age-input">Age : </label>
+          <input type="number" name="age" id="age-input" />
+        </div>
+        <div>
+          <label for="email-input">Email: </label>
+          <input type="text" name="email" id="email-input" />
+        </div>
+        <div>
+          <label for="phoneNumber-input">Phone Number: </label>
+          <input type="text" name="phoneNumber" id="phoneNumber-input" />
+        </div>
+        <div>
+          <label for="profileImage-input">profile Image : </label>
+          <input type="text" name="profileImage" id="profileImage-input" />
+        </div>
+        <input type="submit" value="create" />
+      </form>
+    </form>
+  </body>
+</html>
