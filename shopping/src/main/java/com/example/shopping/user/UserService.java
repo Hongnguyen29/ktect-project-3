@@ -48,27 +48,10 @@ public class UserService  {
             admin.setPassword(passwordEncoder.encode("123456"));
             admin.setEmail("admin@example.com");
             admin.setPhoneNumber("123-456-7890");
-            admin.setRole("ROLE_ADMIN,READ.REQUEST,INSPECT.REQUEST");
+            admin.setRole("ROLE_ADMIN,READ.REQUEST");
             userRepository.save(admin);
         }
-        if (userRepository.findByUsername("user1").isEmpty()) {
-            UserEntity user1 = new UserEntity();
-            user1.setUsername("user1");
-            user1.setPassword(passwordEncoder.encode("123456"));
-            user1.setName("noob");
-            user1.setEmail("admin@example.com");
-            user1.setPhoneNumber("123-456-7890");
-            user1.setRole("ROLE_USER,OPEN.REQUEST,ORDER,READ.REQUEST");
-            userRepository.save(user1);
-        }
-        if (userRepository.findByUsername("user2").isEmpty()) {
-            UserEntity user2 = new UserEntity();
-            user2.setUsername("user2");
-            user2.setPassword(passwordEncoder.encode("123456"));
-            user2.setRole("ROLE_INACTIVE,READ");
 
-            userRepository.save(user2);
-        }
     }
 
 
@@ -81,7 +64,7 @@ public class UserService  {
         UserEntity newUser = new UserEntity();
         newUser.setUsername(dto.getUsername());
         newUser.setPassword(passwordEncoder.encode(dto.getPassword()));
-        newUser.setRole("ROLE_INACTIVE,READ");
+        newUser.setRole("ROLE_INACTIVE");
         userRepository.save(newUser);
     }
 
@@ -89,19 +72,17 @@ public class UserService  {
             JwtRequestDto requestDto
     ){
         if (requestDto.getUsername() == null || requestDto.getPassword() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Please check your username and password again.");
+            throw new IllegalArgumentException("Username and password must not be null.");
         }
         UserDetails userDetails;
-        try{
-            userDetails = customService.
-                    loadUserByUsername(requestDto.getUsername());
-        }catch (UsernameNotFoundException ex){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found.");
+        try {
+            userDetails = customService.loadUserByUsername(requestDto.getUsername());
+        } catch (UsernameNotFoundException ex) {
+            throw new IllegalArgumentException("Username not found.");
         }
         if(!passwordEncoder.matches(
                 requestDto.getPassword(), userDetails.getPassword()))
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password.");
-
+            throw new IllegalArgumentException( "Invalid password.");
         String jwt = jwtTokenUtils.generateToken(userDetails);
         JwtResponseDto responseDto = new JwtResponseDto();
         responseDto.setToken(jwt);
@@ -122,12 +103,10 @@ public class UserService  {
         Optional<UserEntity> optionalUser =
                 userRepository.findByUsername(username);
         if (optionalUser.isEmpty()) {
-            System.out.println("username not exists");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Username not found");
         }
         UserEntity user = optionalUser.get();
-        /*UserEntity user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));*/
+
         if(profileDto.getName() != null){
             user.setName(profileDto.getName());
         }
@@ -141,13 +120,14 @@ public class UserService  {
             user.setPhoneNumber(profileDto.getPhoneNumber());
         }
         userRepository.save(user);
+
         if(user.getName() != null && user.getAge() != null
                 && user.getEmail() != null && user.getPhoneNumber() != null
-                && Objects.equals(user.getRole(), "ROLE_INACTIVE,READ"
+                && Objects.equals(user.getRole(), "ROLE_INACTIVE"
         )){
-            user.setRole("ROLE_USER,READ,ORDER");
+            user.setRole("ROLE_USER,VIEW,ORDER,READ.REQUEST");
+            userRepository.save(user);
         }
-        userRepository.save(user);
 
         return UserDto.fromEntity(user);
     }
@@ -155,6 +135,7 @@ public class UserService  {
             String username,
             MultipartFile image
     ){
+        String timeString = String.valueOf(System.currentTimeMillis());
         Optional<UserEntity> optionalUser =
                 userRepository.findByUsername(username);
         if (optionalUser.isEmpty()) {
@@ -173,22 +154,21 @@ public class UserService  {
         String[] filenameSplit = originalFilename.split("\\.");
         String extension = filenameSplit[filenameSplit.length - 1];
 
-        String uploadPath = profileDir + "profile." + extension;
+        String uploadPath = profileDir + timeString +"profile." + extension;
         try {
             image.transferTo(Path.of(uploadPath));
         }catch (IOException e){
             System.out.println(e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        String reqPath = "/static/"+ username + "/profile." + extension;
+        String reqPath = "/static/"+ username + "/" + timeString + "profile." + extension;
         UserEntity target = optionalUser.get();
 
         target.setProfileImage(reqPath);
 
         return UserDto.fromEntity(userRepository.save(target));
-
-
     }
+
 
 
 

@@ -15,3 +15,13 @@ public abstract class BaseEntity {
     private Long id;
 
 }
+// "ROLE_USER,ORDER,READ.REQUEST"
+//"ROLE_BUSINESS,READ.REQUEST,ACCEPT"
+//"ROLE_ADMIN,READ.REQUEST"
+//"ROLE_INACTIVE"
+
+
+// INACTIVE, USER, BUSINESS, ADMIN
+//  PENDING,
+//    ACCEPTED,
+//    REJECTED

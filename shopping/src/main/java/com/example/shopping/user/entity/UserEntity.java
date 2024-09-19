@@ -1,7 +1,8 @@
 package com.example.shopping.user.entity;
 
 import com.example.shopping.BaseEntity;
-import com.example.shopping.order.entity.OrderItem;
+import com.example.shopping.Request.entity.OpenRequest;
+import com.example.shopping.order.entity.OrderEntity;
 import com.example.shopping.shop.entity.ShopEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,6 +17,7 @@ import java.util.List;
 @Table(name = "user_table")
 @Entity
 @Builder
+
 public class UserEntity extends BaseEntity {
 
     private String username;
@@ -28,15 +30,14 @@ public class UserEntity extends BaseEntity {
     private String profileImage;
 
 
-/*    @OneToOne( cascade = CascadeType.ALL)
-    @JoinColumn(name = "userProfile_id")
-    private UserProfile userProfile;*/
-
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private ShopEntity shop;
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
-    private final List<OrderItem> orderList = new ArrayList<>();
+    private final List<OrderEntity> orderList = new ArrayList<>();
+
+   @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    private final List<OpenRequest> openRequests = new ArrayList<>();
 
 
 

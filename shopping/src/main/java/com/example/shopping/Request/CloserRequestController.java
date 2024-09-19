@@ -1,0 +1,80 @@
+package com.example.shopping.Request;
+
+import com.example.shopping.AuthenticationFacade;
+import com.example.shopping.Request.dto.CloseRequestDto;
+import com.example.shopping.Request.dto.InspectOpenDto;
+import com.example.shopping.Request.dto.OpenRequestDto;
+import com.example.shopping.Request.dto.OpenRequestView;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@Slf4j
+@RequiredArgsConstructor
+@RequestMapping("closeRequest")
+public class CloserRequestController {
+    private final RequestService service;
+    private final AuthenticationFacade authentication;
+
+
+    @PostMapping
+    public ResponseEntity<?> openShop(
+            @RequestParam String reason) {
+        String username = authentication.findUsername();
+
+        try {
+            if (reason == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Please provide a reason!!");
+            }
+            CloseRequestDto closeRequestDto  = service.closerShop(username,reason);
+            return ResponseEntity.ok(closeRequestDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred: " + e.getMessage());
+        }
+    }
+    @PostMapping("/confirm/{closeId}")
+    public ResponseEntity<?> closeConfirm(
+            @PathVariable Long closeId
+    ) {
+        String username = authentication.findUsername();
+        if (!username.equals("admin")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("You are not authorized to perform this action.");
+        }
+        try {
+            CloseRequestDto closeRequestDto = service.closeConfirm(closeId);
+            return ResponseEntity.ok(closeRequestDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
+        }
+    }
+    @GetMapping("/{closeId}")
+    public ResponseEntity<?> readOneClose (
+            @PathVariable
+            Long closeId
+
+    ){
+        String username = authentication.findUsername();
+        try {
+            CloseRequestDto closeRequestDto = service.readOneClose(closeId, username);
+            return ResponseEntity.ok(closeRequestDto);
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
+        }
+    }
+    @GetMapping("/readAll")
+    public List<CloseRequestDto> readAllRequest () {
+        String username = authentication.findUsername();
+        if(username.equals("admin")) {return service.readAllClose();}
+        return null;
+    }
+}

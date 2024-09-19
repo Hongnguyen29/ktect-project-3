@@ -18,15 +18,16 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
-    private final CustomUserDetailsService detailsService;
+   // private final CustomUserDetailsService detailsService;
     private final AuthenticationFacade authentication;
 
     public UserController(UserService userService,
-                         AuthenticationFacade authentication,
-                          CustomUserDetailsService detailsService) {
+                         AuthenticationFacade authentication
+                        //  CustomUserDetailsService detailsService
+    ) {
         this.userService = userService;
         this.authentication = authentication;
-        this.detailsService = detailsService;
+  //      this.detailsService = detailsService;
 
     }
    @PostMapping("/register")
@@ -41,64 +42,51 @@ public class UserController {
        }
    }
     @GetMapping("/login")
-    public JwtResponseDto loginUser(
+    public ResponseEntity<?> login(
             @RequestBody
-            JwtRequestDto dto
-    ){
-        return userService.loginUser(dto);
-    }
-    @GetMapping("/{username}/profile")
-    public ResponseEntity<? extends Object> profile(
-            @PathVariable
-            String username
-    ){
-        String username1 = authentication.findUsername();
+            JwtRequestDto requestDto) {
         try {
-            if (!username1.equals(username)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("You are not authorized to perform this action");
-            }
-            UserDto userDto = userService.profile(username1);
+            JwtResponseDto responseDto = userService.loginUser(requestDto);
+            return ResponseEntity.ok(responseDto);
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
+        }
+    }
+    @GetMapping("/profile")
+    public ResponseEntity<?> profile(){
+        String username = authentication.findUsername();
+        try {
+            UserDto userDto = userService.profile(username);
             return ResponseEntity.ok(userDto);
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(e.getMessage());
         }
     }
-    @PutMapping("/{username}/updateProfile")
+    @PutMapping("/updateProfile")
     public ResponseEntity<String> updateProfile(
-            @PathVariable
-            String username,
             @RequestBody
             UserProfileDto profileDto
     ){
-        String username1 =  authentication.findUsername();
-        if (!username1.equals(username)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("You are not authorized to update the profile image for this user.");
-        }
+        String username =  authentication.findUsername();
         try {
-            userService.updateProfile(username1, profileDto);
+            userService.updateProfile(username, profileDto);
             return ResponseEntity.ok("User information updated successfully");
         }catch (Exception e){
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Failed to update user information");
         }
     }
-    @PutMapping("/{username}/updateImage")
+    @PutMapping("/updateImage")
     public ResponseEntity<?> updateImage(
-            @PathVariable
-            String username,
             @RequestParam
             MultipartFile image
     ){
+        String username = authentication.findUsername();
         log.info("Request to upload profile img for user: {}", username);
         log.info("File name: {}", image.getOriginalFilename());
-        String username1 =  authentication.findUsername();
-        if (!username1.equals(username)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("You are not authorized to update the profile image for this user.");
-        }
+
         try {
             UserDto updateUser = userService.updateImage(username,image);
             return ResponseEntity.ok(updateUser);

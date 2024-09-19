@@ -1,7 +1,6 @@
 package com.example.shopping.user;
 
 import com.example.shopping.user.repo.UserRepository;
-import com.example.shopping.user.entity.CustomUserDetails;
 import com.example.shopping.user.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

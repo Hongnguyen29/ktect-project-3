@@ -1,7 +1,8 @@
 package com.example.shopping.shop.entity;
 
 import com.example.shopping.BaseEntity;
-import com.example.shopping.product.entity.Product;
+import com.example.shopping.ItemCategory;
+import com.example.shopping.order.entity.OrderEntity;
 import com.example.shopping.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,7 +14,7 @@ import java.util.List;
 @Getter
 @Entity
 @AllArgsConstructor
-
+@NoArgsConstructor
 @Builder
 public class ShopEntity extends BaseEntity {
 
@@ -29,9 +30,10 @@ public class ShopEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ItemCategory category;
 
-   /* @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL)
     private final List<Product> products = new ArrayList<>();
+    @OneToMany(mappedBy = "shop",cascade = CascadeType.ALL)
+    private final List<OrderEntity> orders = new ArrayList<>();
 
-    */
 
 }

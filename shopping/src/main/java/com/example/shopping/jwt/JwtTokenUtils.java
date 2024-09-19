@@ -36,7 +36,7 @@ public class JwtTokenUtils {
         Claims jwtClaims = Jwts.claims()
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(now.plusSeconds(60*60*20)));
+                .setExpiration(Date.from(now.plusSeconds(60*60)));
 
         return  Jwts.builder()
                 .setClaims(jwtClaims)
@@ -46,7 +46,6 @@ public class JwtTokenUtils {
     public boolean validate (String token){
         try {
             Claims claims = jwtParser.parseClaimsJws(token).getBody();
-
             log.info("subject: {}", claims.getSubject());
             log.info("issueAt : {}", claims.getIssuedAt());
             log.info("expireAt: {}", claims.getExpiration());

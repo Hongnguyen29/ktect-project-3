@@ -36,28 +36,51 @@ public class WebSecurityConfig {
                     auth.requestMatchers(
                             "/users/login",
                                     "/static/**",
-                                    "/shops/itemCategory")
+                                    "/itemCategory")
                             .permitAll();
                     auth.requestMatchers("/users/register")
                             .anonymous();
                     auth.requestMatchers(
-                            "/users/*/updateProfile",
-                                    "/users/*/updateImage",
-                                    "/users/*/profile")
+                            "/users/updateProfile",
+                                    "/users/updateImage",
+                                    "/users/profile")
                             .authenticated();
 
 
-                    auth.requestMatchers("/openRequest/admin/readAll",
-                                    "/openRequest/admin/confirm/{id}")
+                    auth.requestMatchers("/openRequest/readAll",
+                                    "/openRequest/confirm/{requestId}",
+                                    "/closeRequest/confirm/{closeId}",
+                                    "/closeRequest/reaAll")
                             .hasRole("ADMIN");
 
-                    auth.requestMatchers("/openRequest/{username}")
+                    auth.requestMatchers("/openRequest")
                             .hasRole("USER");
+
+                    auth.requestMatchers(
+                            "/orders/{productId}",
+                                    "orders/delete/{orderId}",
+                                    "orders/user")
+                                    .hasAuthority("ORDER");
+
+                    auth.requestMatchers(
+                            "/shops/update",
+                                    "/closeRequest",
+                                    "/shops/product",
+                                    "/shops/{productId}",
+                                    "/orders/accept/{orderId}",
+                                    "orders/shop")
+                                    .hasRole("BUSINESS");
+
+                    auth.requestMatchers(
+                            "/openRequest/{requestId}",
+                                    "/closeRequest/{closeId}")
+                            .hasAuthority("READ.REQUEST");
 
 
                     auth.requestMatchers(
-                                    "/openRequest/{username}/{requestId}")
-                            .hasAuthority("READ.REQUEST");
+                            "/shops/view",
+                                    "/shops/products")
+                            .hasAuthority("VIEW");
 
                 })
                 .sessionManagement(session -> session
@@ -72,7 +95,6 @@ public class WebSecurityConfig {
                         ),
                         AuthorizationFilter.class
                 )
-
         ;
         return http.build();
     }

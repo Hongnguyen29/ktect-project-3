@@ -1,5 +1,6 @@
 package com.example.shopping;
 
+import com.example.shopping.user.entity.UserEntity;
 import com.example.shopping.user.repo.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,9 @@ public class AuthenticationFacade {
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED, "User not authenticated");
         }
-        String username = ((UserDetails)authentication.getPrincipal()).getUsername();
-        return username;
+        return  ((UserDetails)authentication.getPrincipal()).getUsername();
+    }
+    public UserEntity findUser (){
+        return userRepository.findByUsername(findUsername()).orElseThrow();
     }
 }
