@@ -23,6 +23,7 @@ public class OrderViewDto {
     private Long orderId;
     private String nameItem;
     private Integer quantity;
+    private Integer totalMoney;
     private String status;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime orderTime;
@@ -34,6 +35,7 @@ public class OrderViewDto {
                 .orderId(entity.getId())
                 .nameItem(entity.getProduct().getNameItem())
                 .quantity(entity.getQuantity())
+                .totalMoney(entity.getTotalMoney())
                 .status(entity.getStatus())
                 .orderTime(entity.getOrderTime())
                 .productId(entity.getProduct().getId())

@@ -16,13 +16,13 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/orders")
+//@RequestMapping("/orders")
 public class OrderController {
     private final OrderService orderService;
     private final AuthenticationFacade facade;
 
 
-    @PostMapping("/{productId}")
+    @PostMapping("/orders/{productId}")
     public ResponseEntity<?> createOrder(
             @PathVariable
             Long productId,
@@ -31,7 +31,7 @@ public class OrderController {
     ){
         String username = facade.findUsername();
         try {
-            if (quantity == 0) {
+            if (quantity <= 0) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("Quantity must be greater than 0.");
             }
@@ -41,15 +41,21 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-    @DeleteMapping("/delete/{orderId}")
-    public void deleteOrder(
+    @PutMapping("/orders/cancel/{orderId}")
+    public ResponseEntity<?> deleteOrder(
             @PathVariable
             Long orderId
     ){
         String username = facade.findUsername();
-        orderService.deleteOrder(username,orderId);
+        try {
+            OrderViewDto orderViewDto = orderService.cancelOrder(username,orderId);
+            return ResponseEntity.ok(orderViewDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+
     }
-    @PostMapping("/accept/{orderId}")
+    @PostMapping("/shop/accept/{orderId}")
     public ResponseEntity<?> acceptOrder(
             @PathVariable
             Long orderId
@@ -62,12 +68,26 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-    @GetMapping("/user")
+    @GetMapping("/orders/view/{orderId}")
+    public ResponseEntity<?> viewOneOrder(
+            @PathVariable
+            Long orderId
+    ) {
+        String username = facade.findUsername();
+        try {
+            OrderViewDto orderViewDto = orderService.viewOneOrder(orderId, username);
+            return ResponseEntity.ok(orderViewDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/orders/userView")
     public List<OrderViewDto> userView(){
         UserEntity user = facade.findUser();
         return orderService.userView(user);
     }
-    @GetMapping("/shop")
+    @GetMapping("/shop/orderView")
     public List<OrderViewDto> shopView(){
         UserEntity user = facade.findUser();
         return orderService.shopView(user);

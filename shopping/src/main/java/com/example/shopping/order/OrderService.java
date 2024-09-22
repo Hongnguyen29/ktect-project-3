@@ -40,33 +40,35 @@ public class OrderService {
         ShopEntity shop = product.getShop();
 
         OrderEntity order = new OrderEntity();
-        if(!(user.getRole().equals("ROLE_USER,VIEW,ORDER,READ.REQUEST"))){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
+
         if(quantity > product.getStock()){
             throw new IllegalArgumentException("Error: Order quantity cannot exceed stock quantity.");
         }
         order.setUser(user);
         order.setProduct(product);
         order.setQuantity(quantity);
+        order.setTotalMoney(quantity*product.getPrice());
         order.setStatus("PENDING");
         order.setOrderTime(LocalDateTime.now());
         order.setShop(shop);
         orderRepository.save(order);
         return OrderViewDto.fromEntity(order);
     }
-    public void deleteOrder(
+    public OrderViewDto cancelOrder(
             String username,
             Long orderId
     ){
         OrderEntity order = orderRepository.findById(orderId).orElseThrow();
         String username1 = order.getUser().getUsername();
         if (!(username1.equals(username))) {
-             ResponseEntity.status(HttpStatus.BAD_REQUEST);
+            throw new IllegalArgumentException(
+                    "Cannot access this content.");
         }
         if(order.getStatus().equals("PENDING")){
-            orderRepository.deleteById(orderId);
+            order.setStatus("CANCEL");
+            orderRepository.save(order);
         }
+        return OrderViewDto.fromEntity(order);
     }
     public OrderViewDto acceptOrder(
             Long orderId,
@@ -89,6 +91,21 @@ public class OrderService {
         return OrderViewDto.fromEntity(order);
 
     }
+
+    public OrderViewDto viewOneOrder(
+            Long orderId,
+           String username ){
+        OrderEntity order = orderRepository.findById(orderId).orElseThrow();
+        String username1 = order.getUser().getUsername();
+        ShopEntity shop = order.getShop();
+        if (!((username1.equals(username) ||
+                username.equals(shop.getUser().getUsername())))) {
+            throw new IllegalArgumentException(
+                    "Cannot view this content.");
+        }
+        return OrderViewDto.fromEntity(order);
+    }
+
     public List<OrderViewDto> userView(
             UserEntity user
     ){
@@ -109,8 +126,6 @@ public class OrderService {
             orderViews.add(OrderViewDto.fromEntity(o));
         }
         return orderViews;
-
-
     }
 
 

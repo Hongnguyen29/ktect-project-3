@@ -4,6 +4,7 @@ import com.example.shopping.AuthenticationFacade;
 import com.example.shopping.Request.dto.InspectOpenDto;
 import com.example.shopping.Request.dto.OpenRequestDto;
 import com.example.shopping.Request.dto.OpenRequestView;
+import com.example.shopping.Request.entity.OpenRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,14 +16,14 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("openRequest")
+//@RequestMapping("openRequest")
 
 public class OpenRequestController {
     private final RequestService service;
     private final AuthenticationFacade authentication;
 
 
-    @PostMapping
+    @PostMapping ("/openRequest")
     public ResponseEntity<?> openShop(
             @RequestBody OpenRequestDto dto) {
         String username = authentication.findUsername();
@@ -38,12 +39,13 @@ public class OpenRequestController {
                     .body("Error: " + e.getMessage());
         }
     }
-    @GetMapping("/{requestId}")
+    @GetMapping("/read/openRequest/{requestId}")
     public ResponseEntity<?> readOneRequest (
             @PathVariable
             Long requestId
     ){
         String username = authentication.findUsername();
+
         try {
             OpenRequestView openRequestView = service.readOneRequest(requestId,username);
             return ResponseEntity.ok(openRequestView);
@@ -52,7 +54,7 @@ public class OpenRequestController {
                     .body(e.getMessage());
         }
     }
-    @GetMapping("/readAll")
+    @GetMapping("/admin/openRequest/readAll")
     public List<OpenRequestView> readAllRequest () {
         String username = authentication.findUsername();
         if(username.equals("admin")) {return service.readAllRequest();}
@@ -60,7 +62,7 @@ public class OpenRequestController {
     }
 
 
-    @PostMapping("/confirm/{requestId}")
+    @PostMapping("/admin/openRequest/confirm/{requestId}")
     public ResponseEntity<?> confirmRequest(
             @PathVariable Long requestId,
             @RequestBody InspectOpenDto inspectDto

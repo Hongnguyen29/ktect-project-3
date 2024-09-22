@@ -15,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @Slf4j
-@RequestMapping("/users")
 public class UserController {
     private final UserService userService;
    // private final CustomUserDetailsService detailsService;
@@ -53,7 +52,7 @@ public class UserController {
                     .body(e.getMessage());
         }
     }
-    @GetMapping("/profile")
+    @GetMapping("users/profile")
     public ResponseEntity<?> profile(){
         String username = authentication.findUsername();
         try {
@@ -64,7 +63,7 @@ public class UserController {
                     .body(e.getMessage());
         }
     }
-    @PutMapping("/updateProfile")
+    @PutMapping("users/updateProfile")
     public ResponseEntity<String> updateProfile(
             @RequestBody
             UserProfileDto profileDto
@@ -78,7 +77,7 @@ public class UserController {
                     HttpStatus.BAD_REQUEST, "Failed to update user information");
         }
     }
-    @PutMapping("/updateImage")
+    @PutMapping("users/updateImage")
     public ResponseEntity<?> updateImage(
             @RequestParam
             MultipartFile image

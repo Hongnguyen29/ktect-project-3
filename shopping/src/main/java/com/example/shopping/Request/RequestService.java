@@ -93,7 +93,7 @@ public class RequestService {
             log.info(openRequest.getUser().toString());
 
             if (openRequest.getRequestStatus().equals("ACCEPTED")) {
-                String updatedRoles = "ROLE_BUSINESS,VIEW,ORDER";
+                String updatedRoles = "ROLE_BUSINESS,VIEW,ORDER,READ.REQUEST";
                 user.setRole(updatedRoles);
                 userRepository.save(user);
                 log.info(user.toString());

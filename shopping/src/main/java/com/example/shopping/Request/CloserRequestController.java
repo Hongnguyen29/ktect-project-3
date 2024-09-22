@@ -16,13 +16,13 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("closeRequest")
+//@RequestMapping("closeRequest")
 public class CloserRequestController {
     private final RequestService service;
     private final AuthenticationFacade authentication;
 
 
-    @PostMapping
+    @PostMapping ("/shop/closeRequest")
     public ResponseEntity<?> openShop(
             @RequestParam String reason) {
         String username = authentication.findUsername();
@@ -39,7 +39,7 @@ public class CloserRequestController {
                     .body("An unexpected error occurred: " + e.getMessage());
         }
     }
-    @PostMapping("/confirm/{closeId}")
+    @PostMapping("/admin/closeRequest/confirm/{closeId}")
     public ResponseEntity<?> closeConfirm(
             @PathVariable Long closeId
     ) {
@@ -56,7 +56,7 @@ public class CloserRequestController {
                     .body(e.getMessage());
         }
     }
-    @GetMapping("/{closeId}")
+    @GetMapping("/read/closeRequest/{closeId}")
     public ResponseEntity<?> readOneClose (
             @PathVariable
             Long closeId
@@ -71,7 +71,7 @@ public class CloserRequestController {
                     .body(e.getMessage());
         }
     }
-    @GetMapping("/readAll")
+    @GetMapping("/admin/closeRequest/readAll")
     public List<CloseRequestDto> readAllRequest () {
         String username = authentication.findUsername();
         if(username.equals("admin")) {return service.readAllClose();}

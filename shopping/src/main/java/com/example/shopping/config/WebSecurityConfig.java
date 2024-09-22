@@ -34,52 +34,61 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers(
-                            "/users/login",
+                            "/login",
                                     "/static/**",
                                     "/itemCategory")
                             .permitAll();
-                    auth.requestMatchers("/users/register")
+                    auth.requestMatchers("/register")
                             .anonymous();
                     auth.requestMatchers(
-                            "/users/updateProfile",
+                            /*"/users/updateProfile",
                                     "/users/updateImage",
-                                    "/users/profile")
+                                    "/users/profile",*/
+                                    "/users/**")
                             .authenticated();
 
 
-                    auth.requestMatchers("/openRequest/readAll",
-                                    "/openRequest/confirm/{requestId}",
-                                    "/closeRequest/confirm/{closeId}",
-                                    "/closeRequest/reaAll")
-                            .hasRole("ADMIN");
+                    auth.requestMatchers(
+                            /*"admin/openRequest/readAll",
+                                    "/admin/openRequest/confirm/{requestId}",
+                                    "/admin/closeRequest/confirm/{closeId}",
+                                    "/admin/closeRequest/reaAll" , */
+                                    "/admin/**"
 
-                    auth.requestMatchers("/openRequest")
+                                    ).hasRole("ADMIN");
+
+                    auth.requestMatchers("/openRequest") //
                             .hasRole("USER");
 
                     auth.requestMatchers(
-                            "/orders/{productId}",
-                                    "orders/delete/{orderId}",
-                                    "orders/user")
+                            /*"/orders/{productId}",
+                                    "/orders/cancel/{orderId}",
+                                    "/orders/userView",
+                                    "/orders/view/{orderId}",*/
+                                    "/orders/**")
                                     .hasAuthority("ORDER");
 
                     auth.requestMatchers(
-                            "/shops/update",
-                                    "/closeRequest",
-                                    "/shops/product",
-                                    "/shops/{productId}",
-                                    "/orders/accept/{orderId}",
-                                    "orders/shop")
+                            /*"/shop/update",
+                                    "/shop/closeRequest",
+                                    "/shop/product",
+                                    "/shop/{productId}",
+                                    "/shop/accept/{orderId}",
+                                    "/shop/orderView",*/
+                                    "/shop/**")
                                     .hasRole("BUSINESS");
 
                     auth.requestMatchers(
-                            "/openRequest/{requestId}",
-                                    "/closeRequest/{closeId}")
+                         /*   "/read/openRequest/{requestId}",
+                                    "/read/closeRequest/{closeId}",*/
+                                    "/read/**")
                             .hasAuthority("READ.REQUEST");
 
 
                     auth.requestMatchers(
-                            "/shops/view",
-                                    "/shops/products")
+                            /*"/view/shops",
+                                    "/view/products",*/
+                                    "/view/**")
                             .hasAuthority("VIEW");
 
                 })

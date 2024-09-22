@@ -88,6 +88,9 @@ public class ShopService {
     ){
         ShopEntity shop = shopRepository.findById(shopId).orElseThrow();
         Product product = productRepository.findById(productId).orElseThrow();
+        if(!(product.getShop().getId().equals(shopId))){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
         if( dto.getNameItem() !=null){
             product.setNameItem(dto.getNameItem());
         }
@@ -113,7 +116,11 @@ public class ShopService {
             Long shopId,
             Long productId
     ){
+        Product product = productRepository.findById(productId).orElseThrow();
         ShopEntity shop = shopRepository.findById(shopId).orElseThrow();
+        if(!(product.getShop().getId().equals(shopId))){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
 
         if (!productRepository.existsById(productId)) {
             return  "Product not found";
